@@ -20,7 +20,7 @@ from datasets import load_dataset
 from mlperf_logging_utils import LoraLogger, MLPerfCallback
 from transformers import HfArgumentParser, Trainer, TrainingArguments
 from utils import create_and_prepare_model, peft_module_casting_to_bf16
-
+from datetime import datetime
 
 @dataclass
 class ScriptArguments:
@@ -129,10 +129,19 @@ class ScriptArguments:
             "help": "If True, tests things like proper saving/loading/logging of model"
         },
     )
+    wandb: Optional[bool] = field(
+        default=False,
+        metadata={"help": "If True, uses wandb for logging."},
+    )
     dataset_config_name: Optional[str] = field(default="gov_report")
     hub_model_id: Optional[str] = field(default=None)
     seed: Optional[int] = field(default=42)
 
+    def __post_init__(self):
+        if self.wandb:
+            os.environ["WANDB_ENTITY"] = "vchua"
+            os.environ["WANDB_PROJECT"] = "mlperf-lora"
+            os.environ["WANDB_RUN_ID"] = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}---{os.path.basename(self.model_path)}"
 
 def main(args):
     loralogger = LoraLogger(target_eval_loss=args.target_eval_loss)
@@ -161,7 +170,7 @@ def main(args):
         push_to_hub=args.push_to_hub,
         gradient_checkpointing=args.use_gradient_checkpointing,
         hub_model_id=args.hub_model_id,
-        report_to="tensorboard",
+        report_to="wandb" if args.wandb else "tensorboard",
         seed=args.seed,
     )
 
