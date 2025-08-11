@@ -10,7 +10,9 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "env": {},
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            },
             "cwd": "${workspaceFolder}/mlperf-training/llama2_70b_lora/",
             "program": "scripts/train.py",
             "args": [
@@ -21,7 +23,7 @@
                         "--bf16", "True",
                         // "--wandb",
                         "--logging_steps", "1",
-                        "--eval_steps", "48",
+                        "--eval_steps", "48", // to reduce
                         "--output_dir", "./debug_dryrun/llama-70b_scrolls_gov_report_r16",
                         "--per_device_train_batch_size", "1",
                         "--gradient_accumulation_steps", "1",
@@ -37,8 +39,8 @@
                         "--lora_alpha", "32",
                         "--lora_dropout", "0.1",
                         "--max_steps", "1024",
-                        "--no_use_flash_attn",
-                        // "--use_flash_attn",
+                        // "--no_use_flash_attn",
+                        "--use_flash_attn",
                         "--seed", "1234",
                         "--lora_target_modules", "qkv_proj,o_proj",
                         
