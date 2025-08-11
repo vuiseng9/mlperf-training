@@ -1,11 +1,16 @@
+# set default seed number if not provided
+SEED=${1:-101}
+
+
+# --logging_steps 24 \
 accelerate launch --config_file configs/default_config.yaml scripts/train.py \
---dataset_path "./dataset" \
---model_path "./models/llama-v2-fused-qkv" \
+--dataset_path ../../scrolls_gov_report_preprocessed_mlperf_2/data/ \
+--model_path regisss/llama2-70b-fused-qkv-mlperf \
 --max_seq_len 8192 \
 --bf16 True \
---logging_steps 24 \
+--wandb --logging_steps 24 \
 --eval_steps 48 \
---output_dir "./results/llama-70b_scrolls_gov_report_r16_$1" \
+--output_dir ./results/llama-70b_scrolls_gov_report_r16_$SEED \
 --per_device_train_batch_size 1 \
 --gradient_accumulation_steps 1 \
 --lr_scheduler_type "cosine" \
@@ -21,5 +26,5 @@ accelerate launch --config_file configs/default_config.yaml scripts/train.py \
 --lora_dropout 0.1 \
 --max_steps 1024 \
 --use_flash_attn \
---seed "$1" \
+--seed $SEED \
 --lora_target_modules "qkv_proj,o_proj"
