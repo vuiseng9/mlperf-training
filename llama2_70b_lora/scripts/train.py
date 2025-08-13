@@ -22,6 +22,9 @@ from transformers import HfArgumentParser, Trainer, TrainingArguments
 from utils import create_and_prepare_model, peft_module_casting_to_bf16
 from datetime import datetime
 
+import torch.nn as nn
+from custom import CublasltLinear
+
 @dataclass
 class ScriptArguments:
     """
@@ -205,8 +208,18 @@ def main(args):
     if args.use_peft_lora:
         peft_module_casting_to_bf16(trainer.model, args)
 
-    trainer.train()
+    def replace_linear_with_custom(model, keywords):
+        """Recursively replace nn.Linear with CublasltLinear in the model."""
+        for name, module in model.named_children():
+            if isinstance(module, nn.Linear) and any(keyword in name for keyword in keywords):
+                print(f"[Info]: Replacing {name} with CublasltLinear")
+                setattr(model, name, CublasltLinear.from_linear(module))
+            else:
+                replace_linear_with_custom(module, keywords)
 
+    replace_linear_with_custom(trainer.model, ['default'])
+
+    trainer.train()
 
 if __name__ == "__main__":
     parser = HfArgumentParser(ScriptArguments)

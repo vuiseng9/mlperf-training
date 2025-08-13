@@ -11,7 +11,8 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
-                "CUDA_VISIBLE_DEVICES": "0"
+                "CUDA_VISIBLE_DEVICES": "0",
+                "PYTHONPATH": "/home/shadeform/work/dev/sf-250812-cust-mlperf/quantized-training"
             },
             "cwd": "${workspaceFolder}/mlperf-training/llama2_70b_lora/",
             "program": "scripts/train.py",
