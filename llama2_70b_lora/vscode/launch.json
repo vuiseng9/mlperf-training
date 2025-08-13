@@ -12,13 +12,15 @@
             "justMyCode": false,
             "env": {
                 "CUDA_VISIBLE_DEVICES": "0",
-                "PYTHONPATH": "/home/shadeform/work/dev/sf-250812-cust-mlperf/quantized-training"
+                "PYTHONPATH": "${workspaceFolder}/quantized-training"
             },
             "cwd": "${workspaceFolder}/mlperf-training/llama2_70b_lora/",
             "program": "scripts/train.py",
             "args": [
                         "--dataset_path", "../../scrolls_gov_report_preprocessed_mlperf_2/data/",
-                        "--model_path", "meta-llama/Llama-2-7b-hf", 
+                        "--model_path", 
+                        "meta-llama/Llama-2-7b-hf", 
+                        // "regisss/llama2-70b-fused-qkv-mlperf",
                         // "../../../models/llama2-70b-fused-qkv-mlperf",
                         "--max_seq_len", "8192",
                         "--bf16", "True",

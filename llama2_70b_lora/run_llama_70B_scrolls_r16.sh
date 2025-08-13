@@ -1,6 +1,7 @@
 # set default seed number if not provided
 SEED=${1:-101}
 
+export PYTHONPATH=/home/shadeform/work/dev/sf-250812-cust-lora/quantized-training
 
 # --logging_steps 24 \
 accelerate launch --config_file configs/default_config.yaml scripts/train.py \
