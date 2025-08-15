@@ -108,6 +108,10 @@ class ScriptArguments:
         default=True,
         metadata={"help": "Enables Flash attention for training."},
     )
+    use_te: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Enables Transformer Engine for training."},
+    )
     use_peft_lora: Optional[bool] = field(
         default=True,
         metadata={"help": "Enables PEFT LoRA for training."},

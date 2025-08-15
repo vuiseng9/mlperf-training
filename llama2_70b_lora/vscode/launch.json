@@ -5,6 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "te_llama2",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {},
+            "cwd": "${workspaceFolder}/mlperf-training/llama2_70b_lora/scripts/use_te",
+            "program": "usage.py",
+            "args": []
+        },
+        {
+            "name": "vs-py",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "PYTHONPATH": "${workspaceFolder}/quantized-training"
+            },
+            "cwd": "${workspaceFolder}",
+            "program": "${file}",
+            "args": []
+        },
+        {
             "name": "llama2-70b-lora-sft",
             "type": "debugpy",
             "request": "launch",
@@ -16,6 +41,7 @@
             "cwd": "${workspaceFolder}/mlperf-training/llama2_70b_lora/",
             "program": "scripts/train.py",
             "args": [
+                        "--use_te", 
                         "--dataset_path", "../../scrolls_gov_report_preprocessed_mlperf_2/data/",
                         "--model_path", "meta-llama/Llama-2-7b-hf", 
                         // "../../../models/llama2-70b-fused-qkv-mlperf",

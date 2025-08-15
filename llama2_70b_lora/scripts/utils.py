@@ -5,7 +5,7 @@ import torch
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
 from peft.tuners.lora import LoraLayer
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoConfig
 
 
 def group_texts(examples, block_size):
@@ -130,15 +130,33 @@ def create_datasets(tokenizer, args):
 def create_and_prepare_model(args):
     device_map = None
 
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_path,
-        device_map=device_map,
-        use_cache=not args.use_gradient_checkpointing,
-        trust_remote_code=True,
-        attn_implementation="flash_attention_2" if args.use_flash_attn else "sdpa",
-        torch_dtype=torch.bfloat16,
-        max_position_embeddings=8192,
-    )
+    if args.use_te:
+        from huggingface_hub import snapshot_download
+        from use_te.te_llama import TELlamaForCausalLM
+
+        model_local_path = snapshot_download(args.model_path)
+
+        config = AutoConfig.from_pretrained(model_local_path)
+        config.use_cache = not args.use_gradient_checkpointing
+        config._attn_implementation="flash_attention_2" if args.use_flash_attn else "sdpa"
+        config.max_position_embeddings=8192
+        model = TELlamaForCausalLM.from_pretrained_local(
+            model_local_path, 
+            config=config,
+            device_map=device_map,
+            trust_remote_code=True,
+            torch_dtype=torch.bfloat16,
+        )
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_path,
+            device_map=device_map,
+            use_cache=not args.use_gradient_checkpointing,
+            trust_remote_code=True,
+            attn_implementation="flash_attention_2" if args.use_flash_attn else "sdpa",
+            torch_dtype=torch.bfloat16,
+            max_position_embeddings=8192,
+        )
 
     peft_config = None
     if args.use_peft_lora:
