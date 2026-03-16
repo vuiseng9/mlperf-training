@@ -49,7 +49,55 @@ docker run -it --rm \
 ## Steps to download and verify data
 For all steps below, they are assumed to run inside the container
 
-### CC12M dataset
+### Quick Start: Tiny CC12M Dataset (Recommended for Testing)
+
+For quick testing and development, you can use a tiny subset of CC12M (default: 1024 samples) instead of downloading the full dataset (~1TB raw or ~2.5TB preprocessed). This is useful for:
+- Verifying the training pipeline works
+- Quick debugging and development
+- Testing on limited hardware
+
+**One-command setup:**
+```bash
+cd /path/to/torchtitan
+bash torchtitan/experiments/flux/scripts/setup_tiny_dataset.sh --num_samples 1024 --ngpu 1
+```
+
+This will:
+1. Download 1024 samples from CC12M (~50MB)
+2. Preprocess them with the encoders (~1GB)
+3. Generate empty encodings for classifier-free guidance
+
+**Manual steps (if you prefer more control):**
+
+1. Download tiny dataset:
+```bash
+python -m torchtitan.experiments.flux.scripts.download_tiny_cc12m \
+    --output_dir /dataset/cc12m_tiny \
+    --num_samples 1024
+```
+
+2. Preprocess (requires encoder models downloaded):
+```bash
+NGPU=1 INPUT_PATH=/dataset/cc12m_tiny OUTPUT_PATH=/dataset/cc12m_tiny_preprocessed \
+    bash torchtitan/experiments/flux/scripts/run_tiny_preprocessing.sh
+```
+
+3. Train with preprocessed tiny data:
+```bash
+CONFIG=torchtitan/experiments/flux/train_configs/flux_schnell_mlperf_preprocessed.toml \
+NGPU=1 bash torchtitan/experiments/flux/run_train.sh \
+    --training.dataset=cc12m_tiny_preprocessed \
+    --training.dataset_path=/dataset/cc12m_tiny_preprocessed
+```
+
+**Notes:**
+- The tiny dataset is meant for testing only; convergence behavior will differ from the full dataset
+- Use `--num_samples` to adjust the dataset size (should be divisible by batch_size × num_gpus)
+- Common sizes: 1024, 2048, 4096, 8192
+
+---
+
+### CC12M dataset (Full Dataset)
 To download the cleaned and subsetted dataset, run the following:
 
 **Note:** We reccomend training directly on preprocessed embeddings. To do that, skip [here](#preprocessing).
