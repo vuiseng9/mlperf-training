@@ -14,6 +14,7 @@ Run the following build command from this directory. The build process will take
 ```bash
 # From gpt-oss-20b/primus directory
 docker build -t rocm/amd-mlperf:gpt_oss_20b_training_5.1 .
+docker build -t nv-mlperf-v6-gptoss20b -f Dockerfile.nvidia . # error out
 ```
 
 # 2. Prepare Dataset
@@ -28,7 +29,7 @@ The pre-tokenized dataset is available for download. Navigate to your desired do
 # Create desired download directory with the right permission 
 cd /data/gpt_oss_20b
 
-# Download training and validation data
+# Download training and validation data (10mins or so for fast internet)
 bash <(curl -s https://raw.githubusercontent.com/mlcommons/r2-downloader/refs/heads/main/mlc-r2-downloader.sh) \
     -d data https://training.mlcommons-storage.org/metadata/llama-3-1-8b-preprocessed-c4-dataset.uri
 ```
